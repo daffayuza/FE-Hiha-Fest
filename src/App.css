@@ -1,0 +1,7 @@
+/* Global Reset and Base Styles are in index.css */
+/* This file is kept for app-specific layout if needed, but standard Vite styles are removed to avoid conflicts. */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}

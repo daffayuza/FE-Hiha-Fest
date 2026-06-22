@@ -1,0 +1,131 @@
+.trx-status-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid;
+  margin-bottom: var(--space-xl);
+}
+
+.trx-status-banner div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trx-status-banner span {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.trx-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+}
+
+.trx-section {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+}
+
+.trx-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+}
+
+.trx-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.trx-info-item {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+.trx-info-item svg {
+  color: var(--color-accent-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.trx-info-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trx-info-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.trx-info-value {
+  font-weight: 500;
+}
+
+.trx-price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-accent-primary);
+}
+
+/* ========== Tickets ========== */
+.trx-tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+
+.trx-ticket-card {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.trx-qr {
+  background: white;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trx-ticket-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  justify-content: center;
+}
+
+.trx-ticket-number {
+  font-family: monospace;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.trx-ticket-qr {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+  .trx-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
