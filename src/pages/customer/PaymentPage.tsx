@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { CreditCard, Wallet, Building2, ArrowLeft, Lock, Loader2 } from 'lucide-react';
 import { formatCurrency } from '../../data/mockData';
+import { api } from '../../services/api';
 import './PaymentPage.css';
 
 const paymentMethods = [
@@ -26,13 +27,16 @@ export default function PaymentPage() {
 
   const [selectedMethod, setSelectedMethod] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState('');
 
   if (!state) {
     return (
       <div className="payment-page">
         <div className="container" style={{ paddingTop: '120px', textAlign: 'center' }}>
           <h2>Data pembayaran tidak ditemukan</h2>
-          <Link to="/" className="btn btn-secondary" style={{ marginTop: '1rem' }}>Kembali ke Beranda</Link>
+          <Link to="/" className="btn btn-secondary" style={{ marginTop: '1rem' }}>
+            Kembali ke Beranda
+          </Link>
         </div>
       </div>
     );
@@ -44,22 +48,37 @@ export default function PaymentPage() {
     return acc;
   }, {});
 
-  const handlePay = () => {
+  const handlePay = async () => {
     if (!selectedMethod) return;
     setProcessing(true);
-    // Simulate payment processing
-    setTimeout(() => {
-      const isSuccess = Math.random() > 0.2; // 80% success rate
+    setError('');
+
+    try {
+      // Simulate 2 second payment gateway processing delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Call backend webhook to process payment
+      // Using 80% success rate simulation
+      const willSucceed = Math.random() > 0.2;
+      const status = willSucceed ? 'PAID' : 'FAILED';
+
+      const response = await api.callPaymentWebhook(state.orderNumber, status);
+
       navigate('/payment/status', {
         state: {
-          status: isSuccess ? 'success' : 'pending',
+          status: willSucceed ? 'success' : 'failed',
           orderNumber: state.orderNumber,
           concertName: state.concert.name,
           buyerEmail: state.buyer.email,
           totalPrice: state.ticket.totalPrice,
+          webhookResponse: response,
         },
       });
-    }, 2000);
+    } catch (err: any) {
+      console.error('Payment error:', err);
+      setError(err.message || 'Terjadi kesalahan saat memproses pembayaran');
+      setProcessing(false);
+    }
   };
 
   return (
@@ -82,14 +101,10 @@ export default function PaymentPage() {
               <div key={category} className="method-group">
                 <h3 className="method-category">{category}</h3>
                 <div className="method-list">
-                  {methods.map(method => {
+                  {methods.map((method) => {
                     const Icon = method.icon;
                     return (
-                      <button
-                        key={method.id}
-                        className={`method-option ${selectedMethod === method.id ? 'selected' : ''}`}
-                        onClick={() => setSelectedMethod(method.id)}
-                      >
+                      <button key={method.id} className={`method-option ${selectedMethod === method.id ? 'selected' : ''}`} onClick={() => setSelectedMethod(method.id)}>
                         <Icon size={22} />
                         <span>{method.name}</span>
                         <div className={`method-radio ${selectedMethod === method.id ? 'checked' : ''}`} />
@@ -115,7 +130,9 @@ export default function PaymentPage() {
               </div>
               <div className="pay-row">
                 <span>Tiket</span>
-                <span>{state.ticket.categoryName} x{state.ticket.quantity}</span>
+                <span>
+                  {state.ticket.categoryName} x{state.ticket.quantity}
+                </span>
               </div>
               <div className="pay-row">
                 <span>Pembeli</span>
@@ -127,11 +144,22 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            <button
-              className="btn btn-primary btn-lg pay-btn"
-              onClick={handlePay}
-              disabled={!selectedMethod || processing}
-            >
+            {error && (
+              <div
+                style={{
+                  padding: '0.75rem 1rem',
+                  marginBottom: '1rem',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  color: '#dc2626',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+            <button className="btn btn-primary btn-lg pay-btn" onClick={handlePay} disabled={!selectedMethod || processing}>
               {processing ? (
                 <>
                   <Loader2 size={20} className="spin" />

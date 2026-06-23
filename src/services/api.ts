@@ -1,5 +1,13 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Helper function to check for auth errors and redirect if necessary
+const handleAuthError = (status: number) => {
+  if (status === 401 || status === 403) {
+    localStorage.removeItem('admin_token');
+    window.location.href = '/admin/login';
+  }
+};
+
 export const api = {
   // Events
   getEvents: async () => {
@@ -11,9 +19,12 @@ export const api = {
   getAdminEvents: async () => {
     const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_URL}/events`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error('Failed to fetch events');
+    if (!res.ok) {
+      handleAuthError(res.status);
+      throw new Error('Failed to fetch events');
+    }
     return res.json();
   },
 
@@ -44,14 +55,17 @@ export const api = {
     return res.json();
   },
 
-  // Payment Webhook (Simulation for Frontend)
-  processPayment: async (orderNumber: string, status: string) => {
-    const res = await fetch(`${API_URL}/checkout/payment`, {
+  // Payment Webhook - Call backend webhook to process payment
+  callPaymentWebhook: async (orderNumber: string, status: string) => {
+    const res = await fetch(`${API_URL}/checkout/webhook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderNumber, status }),
     });
-    if (!res.ok) throw new Error('Failed to process payment');
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Failed to process payment');
+    }
     return res.json();
   },
 
@@ -62,11 +76,12 @@ export const api = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
     if (!res.ok) {
+      handleAuthError(res.status);
       const err = await res.json();
       throw new Error(err.message || 'Failed to create event');
     }
@@ -79,11 +94,12 @@ export const api = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
     if (!res.ok) {
+      handleAuthError(res.status);
       const err = await res.json();
       throw new Error(err.message || 'Failed to update event');
     }
@@ -95,10 +111,11 @@ export const api = {
     const res = await fetch(`${API_URL}/events/${id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!res.ok) {
+      handleAuthError(res.status);
       const err = await res.json();
       throw new Error(err.message || 'Failed to delete event');
     }
@@ -122,29 +139,38 @@ export const api = {
   getDashboardStats: async () => {
     const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_URL}/admin/dashboard`, {
-      headers: { 
-        'Authorization': `Bearer ${token}`
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+    if (!res.ok) {
+      handleAuthError(res.status);
+      throw new Error('Failed to fetch dashboard stats');
+    }
     return res.json();
   },
-  
+
   getTransactions: async () => {
     const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_URL}/admin/transactions`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error('Failed to fetch transactions');
+    if (!res.ok) {
+      handleAuthError(res.status);
+      throw new Error('Failed to fetch transactions');
+    }
     return res.json();
   },
 
   getTransactionById: async (id: string) => {
     const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_URL}/admin/transactions/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error('Failed to fetch transaction detail');
+    if (!res.ok) {
+      handleAuthError(res.status);
+      throw new Error('Failed to fetch transaction detail');
+    }
     return res.json();
   },
 };

@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, CalendarDays, Receipt, LogOut, Music2 } from 'lucide-react';
 import './AdminLayout.css';
 
@@ -8,6 +8,14 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear admin token from localStorage
+    localStorage.removeItem('admin_token');
+    // Navigate to login page
+    navigate('/admin/login', { replace: true });
+  };
 
   if (location.pathname === '/admin/login') {
     return <>{children}</>;
@@ -35,16 +43,32 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </NavLink>
         </nav>
         <div className="admin-sidebar-footer">
-          <NavLink to="/admin/login" className="admin-nav-link logout">
+          <button
+            onClick={handleLogout}
+            className="admin-nav-link logout"
+            style={{
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem 1rem',
+              borderRadius: '0.5rem',
+              color: 'inherit',
+              fontSize: 'inherit',
+              fontFamily: 'inherit',
+              transition: 'all 0.3s ease',
+            }}
+          >
             <LogOut size={20} />
             <span>Logout</span>
-          </NavLink>
+          </button>
         </div>
       </aside>
       <main className="admin-main">
-        <div className="admin-content">
-          {children}
-        </div>
+        <div className="admin-content">{children}</div>
       </main>
     </div>
   );

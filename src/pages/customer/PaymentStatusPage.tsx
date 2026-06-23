@@ -11,6 +11,7 @@ export default function PaymentStatusPage() {
     concertName: string;
     buyerEmail: string;
     totalPrice: number;
+    webhookResponse?: any;
   } | null;
 
   if (!state) {
@@ -18,7 +19,9 @@ export default function PaymentStatusPage() {
       <div className="status-page">
         <div className="container status-center">
           <h2>Tidak ada data pembayaran</h2>
-          <Link to="/" className="btn btn-secondary" style={{ marginTop: '1rem' }}>Kembali ke Beranda</Link>
+          <Link to="/" className="btn btn-secondary" style={{ marginTop: '1rem' }}>
+            Kembali ke Beranda
+          </Link>
         </div>
       </div>
     );
@@ -55,10 +58,7 @@ export default function PaymentStatusPage() {
     <div className="status-page">
       <div className="container status-center">
         <div className="status-card animate-fade-in-up">
-          <div
-            className="status-icon-wrapper"
-            style={{ backgroundColor: config.bgColor }}
-          >
+          <div className="status-icon-wrapper" style={{ backgroundColor: config.bgColor }}>
             <Icon size={56} style={{ color: config.color }} />
           </div>
 
