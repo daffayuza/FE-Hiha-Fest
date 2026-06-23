@@ -1,13 +1,44 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Phone, Ticket, Calendar, CreditCard, AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-react';
-import { transactions, formatCurrency, formatDateTime } from '../../data/mockData';
+import { ArrowLeft, User, Mail, Phone, Ticket, Calendar, CreditCard, AlertCircle, CheckCircle2, Clock, XCircle, Loader2 } from 'lucide-react';
+import { api } from '../../services/api';
+import { formatCurrency, formatDateTime } from '../../data/mockData';
 import './TransactionDetailPage.css';
 
 export default function TransactionDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const transaction = transactions.find(t => t.id === id);
+  const [transaction, setTransaction] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!transaction) {
+  useEffect(() => {
+    const fetchDetail = async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const result = await api.getTransactionById(id);
+        setTransaction(result);
+        setError(null);
+      } catch (err: any) {
+        console.error('Error fetching transaction detail:', err);
+        setError('Gagal memuat detail transaksi.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetail();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="animate-spin" size={48} />
+      </div>
+    );
+  }
+
+  if (error || !transaction) {
     return (
       <div>
         <Link to="/admin/transactions" className="back-link" style={{ display: 'inline-flex', marginBottom: '1rem' }}>
@@ -16,20 +47,20 @@ export default function TransactionDetailPage() {
         </Link>
         <div className="empty-state">
           <AlertCircle size={48} />
-          <h3>Transaksi tidak ditemukan</h3>
+          <h3>{error || 'Transaksi tidak ditemukan'}</h3>
         </div>
       </div>
     );
   }
 
   const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; label: string; bg: string }> = {
-    paid: { icon: CheckCircle2, color: 'var(--color-success)', label: 'Lunas', bg: 'rgba(34, 197, 94, 0.1)' },
-    pending: { icon: Clock, color: 'var(--color-warning)', label: 'Menunggu Pembayaran', bg: 'rgba(245, 158, 11, 0.1)' },
-    expired: { icon: AlertCircle, color: 'var(--color-error)', label: 'Kedaluwarsa', bg: 'rgba(239, 68, 68, 0.1)' },
-    failed: { icon: XCircle, color: 'var(--color-error)', label: 'Gagal', bg: 'rgba(239, 68, 68, 0.1)' },
+    PAID: { icon: CheckCircle2, color: 'var(--color-success)', label: 'Lunas', bg: 'rgba(34, 197, 94, 0.1)' },
+    PENDING: { icon: Clock, color: 'var(--color-warning)', label: 'Menunggu Pembayaran', bg: 'rgba(245, 158, 11, 0.1)' },
+    EXPIRED: { icon: AlertCircle, color: 'var(--color-error)', label: 'Kedaluwarsa', bg: 'rgba(239, 68, 68, 0.1)' },
+    FAILED: { icon: XCircle, color: 'var(--color-error)', label: 'Gagal', bg: 'rgba(239, 68, 68, 0.1)' },
   };
 
-  const config = statusConfig[transaction.status];
+  const config = statusConfig[transaction.status] || statusConfig.PENDING;
   const StatusIcon = config.icon;
 
   return (
@@ -90,14 +121,14 @@ export default function TransactionDetailPage() {
               <Calendar size={18} />
               <div>
                 <span className="trx-info-label">Event</span>
-                <span className="trx-info-value">{transaction.concertName}</span>
+                <span className="trx-info-value">{transaction.concert?.name}</span>
               </div>
             </div>
             <div className="trx-info-item">
               <Ticket size={18} />
               <div>
                 <span className="trx-info-label">Tiket</span>
-                <span className="trx-info-value">{transaction.ticketCategory} × {transaction.quantity}</span>
+                <span className="trx-info-value">{transaction.ticketCategory?.name} × {transaction.quantity}</span>
               </div>
             </div>
             <div className="trx-info-item">
@@ -116,15 +147,17 @@ export default function TransactionDetailPage() {
         <div className="trx-section" style={{ marginTop: 'var(--space-xl)' }}>
           <h3>Tiket Digital</h3>
           <div className="trx-tickets-grid">
-            {transaction.tickets.map(tkt => (
+            {transaction.tickets.map((tkt: any) => (
               <div key={tkt.id} className="trx-ticket-card">
                 <div className="trx-qr">
-                  <div className="qr-pattern" style={{
-                    width: 80,
-                    height: 80,
-                    background: 'repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 10px 10px',
-                    borderRadius: 4,
-                  }} />
+                  {tkt.qrCode && (
+                     <div className="qr-pattern" style={{
+                      width: 80,
+                      height: 80,
+                      background: 'repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 10px 10px',
+                      borderRadius: 4,
+                    }} />
+                  )}
                 </div>
                 <div className="trx-ticket-info">
                   <div>

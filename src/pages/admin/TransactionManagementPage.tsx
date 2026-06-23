@@ -1,15 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Search } from 'lucide-react';
-import { transactions, concerts, formatCurrency, formatDateTime } from '../../data/mockData';
+import { Eye, Search, Loader2 } from 'lucide-react';
+import { api } from '../../services/api';
+import { formatCurrency, formatDateTime } from '../../data/mockData';
 
 export default function TransactionManagementPage() {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [eventFilter, setEventFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filtered = transactions.filter(t => {
-    const matchStatus = !statusFilter || t.status === statusFilter;
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true);
+        const result = await api.getTransactions();
+        setData(result);
+        setError(null);
+      } catch (err: any) {
+        console.error('Error fetching transactions:', err);
+        setError('Gagal memuat data transaksi.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const filtered = data.filter(t => {
+    const matchStatus = !statusFilter || t.status === statusFilter.toUpperCase();
     const matchEvent = !eventFilter || t.concertId === eventFilter;
     const matchSearch = !searchQuery ||
       t.buyerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -18,15 +40,35 @@ export default function TransactionManagementPage() {
     return matchStatus && matchEvent && matchSearch;
   });
 
+  const concerts = Array.from(new Set(data.map(t => JSON.stringify({ id: t.concertId, name: t.concert?.name }))))
+    .map(s => JSON.parse(s));
+
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      paid: 'success', pending: 'warning', expired: 'error', failed: 'error',
+      PAID: 'success', PENDING: 'warning', EXPIRED: 'error', FAILED: 'error',
     };
     const labels: Record<string, string> = {
-      paid: 'Lunas', pending: 'Menunggu', expired: 'Kedaluwarsa', failed: 'Gagal',
+      PAID: 'Lunas', PENDING: 'Menunggu', EXPIRED: 'Kedaluwarsa', FAILED: 'Gagal',
     };
-    return <span className={`badge badge-${map[status]}`}>{labels[status]}</span>;
+    return <span className={`badge badge-${map[status] || 'info'}`}>{labels[status] || status}</span>;
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="animate-spin" size={48} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="card text-center p-8">
+        <p className="text-red-500 mb-4">{error}</p>
+        <button onClick={() => window.location.reload()} className="btn btn-secondary">Coba Lagi</button>
+      </div>
+    );
+  }
 
   return (
     <div>

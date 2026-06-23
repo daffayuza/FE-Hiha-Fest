@@ -129,4 +129,22 @@ export const api = {
     if (!res.ok) throw new Error('Failed to fetch dashboard stats');
     return res.json();
   },
+  
+  getTransactions: async () => {
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API_URL}/admin/transactions`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch transactions');
+    return res.json();
+  },
+
+  getTransactionById: async (id: string) => {
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API_URL}/admin/transactions/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch transaction detail');
+    return res.json();
+  },
 };
