@@ -34,7 +34,7 @@ export const api = {
     return res.json();
   },
 
-  // Checkout
+  // Checkout — now returns snapToken for Midtrans Snap popup
   createCheckout: async (data: any) => {
     const res = await fetch(`${API_URL}/checkout`, {
       method: 'POST',
@@ -55,17 +55,10 @@ export const api = {
     return res.json();
   },
 
-  // Payment Webhook - Call backend webhook to process payment
-  callPaymentWebhook: async (orderNumber: string, status: string) => {
-    const res = await fetch(`${API_URL}/checkout/webhook`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderNumber, status }),
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'Failed to process payment');
-    }
+  // Payment Status — check transaction status after Snap popup
+  getPaymentStatus: async (orderNumber: string) => {
+    const res = await fetch(`${API_URL}/checkout/status/${orderNumber}`);
+    if (!res.ok) throw new Error('Failed to fetch payment status');
     return res.json();
   },
 

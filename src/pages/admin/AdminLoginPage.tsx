@@ -90,8 +90,6 @@ export default function AdminLoginPage() {
               )}
             </button>
           </form>
-
-          <p className="login-hint">Demo: masukkan email & password apapun</p>
         </div>
       </div>
     </div>

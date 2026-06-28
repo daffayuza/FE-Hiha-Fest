@@ -5,6 +5,23 @@ import { api } from '../../services/api';
 import { formatCurrency, formatDate } from '../../data/mockData';
 import './CheckoutPage.css';
 
+// Declare Snap type for TypeScript
+declare global {
+  interface Window {
+    snap: {
+      pay: (
+        token: string,
+        callbacks: {
+          onSuccess?: (result: any) => void;
+          onPending?: (result: any) => void;
+          onError?: (result: any) => void;
+          onClose?: () => void;
+        }
+      ) => void;
+    };
+  }
+}
+
 export default function CheckoutPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -59,19 +76,60 @@ export default function CheckoutPage() {
         buyerEmail: form.email,
         buyerPhone: form.phone
       });
-      
-      navigate('/payment', {
-        state: {
-          ...state,
-          buyer: form,
-          orderNumber: response.transaction.orderNumber,
-          transactionId: response.transaction.id
-        },
-      });
+
+      const { snapToken, transaction } = response;
+
+      // Open Midtrans Snap popup
+      if (window.snap && snapToken) {
+        window.snap.pay(snapToken, {
+          onSuccess: (result: any) => {
+            console.log('Payment success:', result);
+            navigate('/payment/status', {
+              state: {
+                status: 'success',
+                orderNumber: transaction.orderNumber,
+                concertName: state.concert.name,
+                buyerEmail: form.email,
+                totalPrice: state.ticket.totalPrice,
+              },
+            });
+          },
+          onPending: (result: any) => {
+            console.log('Payment pending:', result);
+            navigate('/payment/status', {
+              state: {
+                status: 'pending',
+                orderNumber: transaction.orderNumber,
+                concertName: state.concert.name,
+                buyerEmail: form.email,
+                totalPrice: state.ticket.totalPrice,
+              },
+            });
+          },
+          onError: (result: any) => {
+            console.error('Payment error:', result);
+            navigate('/payment/status', {
+              state: {
+                status: 'failed',
+                orderNumber: transaction.orderNumber,
+                concertName: state.concert.name,
+                buyerEmail: form.email,
+                totalPrice: state.ticket.totalPrice,
+              },
+            });
+          },
+          onClose: () => {
+            console.log('Snap popup closed without finishing payment');
+            setSubmitting(false);
+            setSubmitError('Pembayaran belum selesai. Silakan coba lagi atau pilih metode pembayaran lain.');
+          },
+        });
+      } else {
+        throw new Error('Midtrans Snap tidak tersedia. Silakan refresh halaman.');
+      }
     } catch (err: any) {
       console.error('Checkout error:', err);
       setSubmitError(err.message || 'Gagal membuat pesanan. Silakan coba lagi.');
-    } finally {
       setSubmitting(false);
     }
   };
@@ -163,7 +221,7 @@ export default function CheckoutPage() {
               ) : (
                 <>
                   <Ticket size={20} />
-                  Lanjut ke Pembayaran
+                  Bayar Sekarang
                 </>
               )}
             </button>
@@ -198,10 +256,17 @@ export default function CheckoutPage() {
                 <span className="order-total-price">{formatCurrency(state.ticket.totalPrice)}</span>
               </div>
             </div>
+
+            <div className="checkout-secure" style={{ marginTop: '1.5rem', justifyContent: 'center' }}>
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Midtrans_Logo.svg/2560px-Midtrans_Logo.svg.png"
+                alt="Powered by Midtrans"
+                style={{ height: '24px', opacity: 0.7 }}
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
