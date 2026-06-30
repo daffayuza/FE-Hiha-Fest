@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
               <input
                 type="email"
                 className="form-input"
-                placeholder="admin@hahahihifest.com"
+                placeholder="admin@gmail.com"
                 value={form.email}
                 onChange={(e) => { setForm({ ...form, email: e.target.value }); setError(''); }}
               />

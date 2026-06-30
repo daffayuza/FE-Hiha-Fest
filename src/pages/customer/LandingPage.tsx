@@ -113,7 +113,7 @@ export default function LandingPage() {
         <div className="container">
           <div className="concerts-header">
             <h2 className="section-title">
-              <TrendingUp size={28} />
+              {/* <TrendingUp size={28} /> */}
               Konser Mendatang
             </h2>
           </div>

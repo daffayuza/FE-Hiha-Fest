@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="footer-brand">
           <div className="footer-logo">
             <Music2 size={24} />
-            <span>HAHAHIHIFEST</span>
+            <span>Hiha Fest</span>
           </div>
           <p className="footer-desc">
             Platform penjualan tiket konser terpercaya di Indonesia. Temukan event musik favoritmu dan dapatkan tiketnya dengan mudah.
@@ -28,7 +28,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2026 HAHAHIHIFEST. All rights reserved.</p>
+          <p>&copy; 2026 HihaFest. All rights reserved.</p>
         </div>
       </div>
     </footer>

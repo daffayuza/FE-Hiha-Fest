@@ -14,8 +14,8 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo">
-          <Music2 size={28} />
-          <span>HAHAHIHIFEST</span>
+          {/* <Music2 size={28} /> */}
+          <span>Hiha Fest</span>
         </Link>
 
         <div className={`navbar-links ${menuOpen ? 'active' : ''}`}>
