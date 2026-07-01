@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Search, Loader2 } from 'lucide-react';
+import { Eye, Search } from 'lucide-react';
 import { api } from '../../services/api';
 import { formatCurrency, formatDateTime } from '../../data/mockData';
+import { SkeletonPageHeader, SkeletonTable } from '../../components/SkeletonLoader';
 
 export default function TransactionManagementPage() {
   const [data, setData] = useState<any[]>([]);
@@ -55,8 +56,9 @@ export default function TransactionManagementPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="animate-spin" size={48} />
+      <div>
+        <SkeletonPageHeader />
+        <SkeletonTable rows={7} cols={9} />
       </div>
     );
   }
@@ -136,7 +138,7 @@ export default function TransactionManagementPage() {
                 <td>{t.buyerName}</td>
                 <td>{t.buyerEmail}</td>
                 <td>{t.buyerPhone}</td>
-                <td>{t.concertName}</td>
+                <td>{t.concert?.name}</td>
                 <td>{formatCurrency(t.totalPrice)}</td>
                 <td>{statusBadge(t.status)}</td>
                 <td>{formatDateTime(t.createdAt)}</td>

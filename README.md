@@ -1,50 +1,45 @@
-# React + TypeScript + Vite
+# Hihafest Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ini adalah repositori antarmuka pengguna (Frontend) untuk **Hihafest**, platform penjualan tiket konser modern. Aplikasi ini menghubungkan pembeli tiket acara dan administrator melalui Single Page Application yang interaktif dan responsif.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework:** React 18 dengan [Vite](https://vitejs.dev/)
+- **Bahasa:** TypeScript
+- **Styling:** Tailwind CSS (baru di-migrate sepenuhnya untuk memudahkan pengelolaan *utility classes*)
+- **Routing:** React Router v7
+- **Ikonografi:** Lucide React
+- **Visualisasi Data:** Recharts (digunakan untuk *chart* penjualan di dashboard admin)
 
-## Expanding the ESLint configuration
+## Fitur Aplikasi
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Aplikasi frontend ini memuat dua area utama:
+1. **Public/Customer Area:** Landing page untuk *discovery* acara, detail acara eksklusif, serta alur pendaftaran dan checkout pembelian tiket menggunakan *Midtrans UI*.
+2. **Admin Dashboard:** Panel kontrol terproteksi (dibutuhkan otentikasi) yang menangani fitur manajemen acara, memantau *timeline* pendapatan, melacak seluruh proses transaksi, serta pengelolaan informasi profil pengelola.
 
-- Configure the top-level `parserOptions` property like this:
+## Instalasi & Cara Menjalankan
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+1. Pastikan Anda berada di direktori `frontend`.
+   ```bash
+   cd frontend
+   ```
+2. Install seluruh kebutuhan dependensi menggunakan `npm`:
+   ```bash
+   npm install
+   ```
+3. Persiapkan `.env`. Copy dari contoh jika ada, dan konfigurasikan *environment variables* yang wajib digunakan program. Biasanya ini mencakup:
+   - `VITE_API_URL` (Tujuan path endpoint ke Node.js Backend Anda)
+   - `VITE_MIDTRANS_CLIENT_KEY` (Key publik yang bisa didapatkan pada Midtrans Dashboard)
+4. Jalankan development server:
+   ```bash
+   npm run dev
+   ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Aplikasi dapat diamati beroperasi melalui [http://localhost:5173](http://localhost:5173).
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Scripts Utama
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- `npm run dev`: Menjalankan aplikasi dalam mode lokal untuk pengembangan. Mendukung HMR.
+- `npm run build`: Melakukan compiler TypeScript dan mem-build asset production.
+- `npm run lint`: Menjalankan ESLint untuk mengecek kelayakan gaya pengkodean.
+- `npm run preview`: Mensimulasikan hasil dari production build lokal.

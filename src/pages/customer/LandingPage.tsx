@@ -22,7 +22,7 @@ export default function LandingPage() {
         setError(null);
       } catch (err) {
         console.error('Error fetching concerts:', err);
-        setError('Gagal memuat data konser. Pastikan backend sudah berjalan.');
+        setError('Gagal memuat data konser. Pastikan server sudah berjalan.');
       } finally {
         setLoading(false);
       }
@@ -77,7 +77,7 @@ export default function LandingPage() {
       {featured && (
         <section className="hero">
           <div className="hero-bg">
-            <img src={featured.poster} alt={featured.name} />
+            <img className='hero-img' src={featured.poster} alt={featured.name} />
             <div className="hero-overlay" />
           </div>
           <div className="container hero-content">

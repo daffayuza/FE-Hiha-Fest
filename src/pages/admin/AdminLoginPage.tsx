@@ -37,8 +37,7 @@ export default function AdminLoginPage() {
       <div className="login-container">
         <div className="login-card">
           <div className="login-logo">
-            <Music2 size={32} />
-            <span>ADMIN PANEL</span>
+            <span>HIHA FEST ADMIN</span>
           </div>
           <h1>Selamat Datang</h1>
           <p>Masuk ke dashboard admin untuk mengelola event dan transaksi</p>

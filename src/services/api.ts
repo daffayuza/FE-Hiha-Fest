@@ -166,4 +166,16 @@ export const api = {
     }
     return res.json();
   },
+
+  getSalesSummary: async () => {
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API_URL}/admin/sales-summary`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      handleAuthError(res.status);
+      throw new Error('Failed to fetch sales summary');
+    }
+    return res.json();
+  },
 };

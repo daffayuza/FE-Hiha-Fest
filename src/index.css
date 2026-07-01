@@ -348,6 +348,19 @@ textarea.form-input {
   animation: fadeIn 0.4s ease forwards;
 }
 
+/* ========== Skeleton Loader ========== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
 /* ========== Scrollbar ========== */
 ::-webkit-scrollbar {
   width: 8px;

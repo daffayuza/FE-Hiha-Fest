@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <aside className="admin-sidebar">
         <div className="admin-sidebar-logo">
           <Music2 size={24} />
-          <span>ADMIN</span>
+          <span>Hihafest Admin</span>
         </div>
         <nav className="admin-nav">
           <NavLink to="/admin/dashboard" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>

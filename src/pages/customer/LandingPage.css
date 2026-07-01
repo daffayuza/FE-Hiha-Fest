@@ -8,6 +8,10 @@
   overflow: hidden;
 }
 
+.hero-img {
+  object-fit: cover;
+}
+ 
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -36,6 +40,30 @@
   position: relative;
   z-index: 1;
   animation: fadeInUp 0.8s ease;
+}
+
+.error-state {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-lg);
+  color: var(--color-text-muted);
+}
+
+.error-state svg {
+  margin-bottom: var(--space-lg);
+  opacity: 0.5;
+}
+
+.error-state h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-sm);
+  margin-top: 180px;
+}
+
+.error-state button {
+  margin-top: 20px;
+  margin-bottom: 50px;
 }
 
 .hero-badge {

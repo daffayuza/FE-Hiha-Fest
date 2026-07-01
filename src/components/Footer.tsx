@@ -1,4 +1,3 @@
-import { Music2 } from 'lucide-react';
 import './Footer.css';
 
 export default function Footer() {
@@ -7,7 +6,6 @@ export default function Footer() {
       <div className="container footer-inner">
         <div className="footer-brand">
           <div className="footer-logo">
-            <Music2 size={24} />
             <span>Hiha Fest</span>
           </div>
           <p className="footer-desc">

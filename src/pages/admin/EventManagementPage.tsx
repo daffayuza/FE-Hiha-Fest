@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, Search, Eye, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Eye } from 'lucide-react';
 import { api } from '../../services/api';
 import { formatCurrency, formatDate } from '../../data/mockData';
+import { SkeletonPageHeader, SkeletonTable } from '../../components/SkeletonLoader';
 import './EventManagementPage.css';
 
 export default function EventManagementPage() {
@@ -65,8 +66,9 @@ export default function EventManagementPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="animate-spin" size={48} />
+      <div>
+        <SkeletonPageHeader />
+        <SkeletonTable rows={6} cols={7} />
       </div>
     );
   }

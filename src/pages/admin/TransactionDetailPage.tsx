@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Phone, Ticket, Calendar, CreditCard, AlertCircle, CheckCircle2, Clock, XCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Ticket, Calendar, CreditCard, AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { api } from '../../services/api';
 import { formatCurrency, formatDateTime } from '../../data/mockData';
+import { SkeletonDetailCards, SkeletonPageHeader } from '../../components/SkeletonLoader';
 import './TransactionDetailPage.css';
 
 export default function TransactionDetailPage() {
@@ -32,8 +33,9 @@ export default function TransactionDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="animate-spin" size={48} />
+      <div>
+        <SkeletonPageHeader />
+        <SkeletonDetailCards rows={4} />
       </div>
     );
   }

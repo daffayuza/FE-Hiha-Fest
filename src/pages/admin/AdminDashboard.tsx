@@ -1,21 +1,19 @@
 import { useState, useEffect } from 'react';
-import { CalendarDays, Ticket, DollarSign, TrendingUp, Loader2 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { CalendarDays, Ticket, DollarSign, TrendingUp } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Legend
+} from 'recharts';
 import { api } from '../../services/api';
 import { formatCurrency } from '../../data/mockData';
+import {
+  SkeletonStatCards, SkeletonChart, SkeletonTable, SkeletonPageHeader
+} from '../../components/SkeletonLoader';
 import './AdminDashboard.css';
-
-const salesData = [
-  { month: 'Jan', penjualan: 12000000 },
-  { month: 'Feb', penjualan: 18500000 },
-  { month: 'Mar', penjualan: 22000000 },
-  { month: 'Apr', penjualan: 15000000 },
-  { month: 'Mei', penjualan: 28000000 },
-  { month: 'Jun', penjualan: 35000000 },
-];
 
 export default function AdminDashboard() {
   const [data, setData] = useState<any>(null);
+  const [salesData, setSalesData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,8 +21,12 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await api.getDashboardStats();
-        setData(result);
+        const [stats, sales] = await Promise.all([
+          api.getDashboardStats(),
+          api.getSalesSummary(),
+        ]);
+        setData(stats);
+        setSalesData(sales);
         setError(null);
       } catch (err: any) {
         console.error('Dashboard fetch error:', err);
@@ -39,8 +41,13 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="animate-spin" size={48} />
+      <div>
+        <SkeletonPageHeader />
+        <SkeletonStatCards />
+        <SkeletonChart />
+        <div className="dashboard-table card" style={{ marginTop: '1.5rem' }}>
+          <SkeletonTable rows={5} cols={5} />
+        </div>
       </div>
     );
   }
@@ -64,6 +71,30 @@ export default function AdminDashboard() {
       PAID: 'Lunas', PENDING: 'Menunggu', EXPIRED: 'Kedaluwarsa', FAILED: 'Gagal',
     };
     return <span className={`badge badge-${map[status] || 'info'}`}>{labels[status] || status}</span>;
+  };
+
+  // Custom tooltip for dual-axis chart
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{
+          background: '#1a1a2e',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 8,
+          padding: '0.75rem 1rem',
+          color: '#f1f5f9',
+          fontSize: '0.85rem',
+        }}>
+          <p style={{ fontWeight: 600, marginBottom: 6 }}>{label}</p>
+          {payload.map((p: any) => (
+            <p key={p.dataKey} style={{ color: p.color, marginBottom: 2 }}>
+              {p.name}: {p.dataKey === 'revenue' ? formatCurrency(p.value) : p.value.toLocaleString()}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -105,34 +136,66 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Chart */}
+      {/* Sales Chart */}
       <div className="dashboard-chart card">
-        <h3>Grafik Penjualan</h3>
-        <div className="chart-wrapper">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={salesData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-              <YAxis stroke="#64748b" fontSize={12} tickFormatter={(v) => `${(v / 1000000).toFixed(0)}jt`} />
-              <Tooltip
-                contentStyle={{
-                  background: '#1a1a2e',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  color: '#f1f5f9',
-                }}
-                formatter={(value: any) => [formatCurrency(Number(value)), 'Penjualan']}
-              />
-              <Bar dataKey="penjualan" fill="url(#barGradient)" radius={[6, 6, 0, 0]} />
-              <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#a855f7" />
-                  <stop offset="100%" stopColor="#6366f1" />
-                </linearGradient>
-              </defs>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <h3 style={{ marginBottom: '1rem', fontWeight: 600 }}>Grafik Penjualan</h3>
+        {salesData.length === 0 ? (
+          <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '2rem' }}>
+            Belum ada data penjualan
+          </p>
+        ) : (
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={salesData} margin={{ top: 8, right: 20, left: 10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
+                <YAxis
+                  yAxisId="left"
+                  stroke="#a855f7"
+                  fontSize={11}
+                  tickFormatter={(v) => v.toLocaleString()}
+                  label={{ value: 'Tiket', angle: -90, position: 'insideLeft', fill: '#a855f7', fontSize: 11, dx: -4 }}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  stroke="#22c55e"
+                  fontSize={11}
+                  tickFormatter={(v) => `${(v / 1_000_000).toFixed(0)}jt`}
+                  label={{ value: 'Revenue', angle: 90, position: 'insideRight', fill: '#22c55e', fontSize: 11, dx: 12 }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+                <Bar
+                  yAxisId="left"
+                  dataKey="tiketTerjual"
+                  name="Tiket Terjual"
+                  fill="url(#barGradientPurple)"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={48}
+                />
+                <Bar
+                  yAxisId="right"
+                  dataKey="revenue"
+                  name="Revenue"
+                  fill="url(#barGradientGreen)"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={48}
+                />
+                <defs>
+                  <linearGradient id="barGradientPurple" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#a855f7" />
+                    <stop offset="100%" stopColor="#6366f1" />
+                  </linearGradient>
+                  <linearGradient id="barGradientGreen" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#22c55e" />
+                    <stop offset="100%" stopColor="#16a34a" />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/* Recent Transactions */}
